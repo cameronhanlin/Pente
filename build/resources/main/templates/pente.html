@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/app.css}" />
+</head>
+<body>
+
+
+<div class="btn-group">
+    <a href="/startNewGame">
+        <button>Start a new Game</button>
+    </a>
+</div>
+
+<br>
+
+
+<div th:hidden="${!humanWon}">
+    The human person won
+</div>
+<div th:hidden="${!computerWon}">
+    The machine won
+</div>
+
+
+<div class="penteBoard">
+    <div th:each="currentRow : ${theBoard}">
+        <div class="row">
+            <div th:each="currentTile : ${currentRow}">
+                <div class="tile">
+                    <a th:href="'/human/'+${currentTile.id}">
+                        <img class="tileIMG" th:src="@{'/TileImages/' + ${currentTile.colorTile} + '.png'}"/>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+</body>
+</html>
+
