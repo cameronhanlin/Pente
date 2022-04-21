@@ -2,10 +2,12 @@ package Pente.Model;
 
 import org.springframework.stereotype.Component;
 
+import javax.sound.midi.Soundbank;
 import java.awt.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Random;
 
 @Component
@@ -13,10 +15,14 @@ public class PenteBoard {
 
     ArrayList<ArrayList<PenteTile>> theBoard = new ArrayList<>();
     Random rand = new Random();
+    int humanCaptures;
+    int computerCaptures;
 
 
     public void newBoard(){
         theBoard.clear();
+        humanCaptures = 0;
+        computerCaptures =0;
         int cellID = 0;
         for(int i=0; i<19; i++){
             ArrayList<PenteTile> tempRow = new ArrayList<>();
@@ -44,18 +50,17 @@ public class PenteBoard {
     public void makeComputerMove(String humanTile){
 
         /*Priority of computer moves
-        --if have 4 in a row, play the 5th to win
-        --if have a 5 but missing one pocket to win
+        if have 4 in a row, play the 5th to win
+        if have a 5 but missing one pocket to win
         --if have 4 captured, capture a 5th to win
-        --if opponent has 4 in a row, block
+        if opponent has 4 in a row, block
         --if oppenent has 4 captures, block the capture
-        --check for if oppenent has a pocket 5 in row HHFHH
-        --if have open 3, make open 4 prioritize an area that it could have 5 in a row to win
-        --look for a pocket to make 4 in a row CFCC
-        --if oppenent has open 3 in a row, block
-
-        --if can make a capture, do it.
-        --if can block a capture, block it
+        check for if oppenent has a pocket 5 in row HHFHH
+        if have open 3, make open 4 prioritize an area that it could have 5 in a row to win
+        look for a pocket to make 4 in a row CFCC
+        if oppenent has open 3 in a row, block
+        if can make a capture, do it.
+        if can block a capture, block it
         --if have open 2, make open 3, prioritize an area that it could have 5 in a row
         --else play a random piece near where the human last played?
 
@@ -63,14 +68,14 @@ public class PenteBoard {
 
         boolean moveMade = false;
 
-
-
-
-        ArrayList<String> priority = new ArrayList<String>(
+        ArrayList<String> priority = new ArrayList<String>(  //this Generates a priority for paterns it could play on.
                 Arrays.asList("CCCCF","FCCCC", "CFCCC","CCFCC","CCCFC", // add a fifth to win
-                        "FHHHH","HHHHF", "HFHHH", "HHFHH", "HHHFH",// block a fifth
-                        "FCCCF", // make open ended 4 ?? add on a 6th?
-                        "FHHHF")); //block an open ended 4 from being made
+                        "FHHHH","HHHHF", "HFHHH", "HHFHH", "HHHFH",// block a fifth that human could win
+                        "fFCCCf", "fCCCFf", "fCFCCf", "fCCFCf", // make open ended 4
+                        "FHHHF", "fHFHHf", "fHHFHf", //block an open ended 4 from being made
+                        "FHHC", "CHHF", // capture
+                        "FCCH","HCCF", //block capture
+                        "fCFFCf")); //tries to connect its own pieces better
         ArrayList<String> stringBoard = theBoardAsStrings();
 
 
@@ -79,7 +84,7 @@ public class PenteBoard {
             boolean doesContain = (boolean)someReturn.get(0);
             if(doesContain){
                 String line = (String)someReturn.get(1);
-                String lineKey = line.substring(0,line.length()-6);
+                String lineKey = line.substring(0,line.length()-5);
                 String lineCode = line.substring(line.length()-5,line.length());
                 System.out.println(lineKey+" "+lineCode);
                 knownComputerMove(checkFor, lineKey, lineCode);
@@ -94,15 +99,19 @@ public class PenteBoard {
             makeRandoComputerMove(humanTile);
         }
 
+
+
     }
 
     public void knownComputerMove(String checkFor, String lineKey, String lineCode){
 
+        checkFor = checkFor.replaceAll("f","");
         int place = lineKey.indexOf(checkFor);
         int placePlus = 0;
         int count = checkFor.length() - checkFor.replaceAll("F","").length();
         int line = Integer.valueOf(lineCode.substring(0,2))-10;
         String lineDirection = lineCode.substring(2);
+        System.out.println("looking for "+checkFor);
         System.out.println("In Known Computer Moves, Line num "+line);
         System.out.println("In Known Computer Moves, Direction "+lineDirection);
 
@@ -123,16 +132,52 @@ public class PenteBoard {
         if(lineDirection.equals("row")){
             theBoard.get(line).get(place).setColorTile("C");
             theBoard.get(line).get(place).setFreeSpace(false);
+            checkForCaptures("C", line, place);
         } else if (lineDirection.equals("col")) {
             theBoard.get(place).get(line).setColorTile("C");
             theBoard.get(place).get(line).setFreeSpace(false);
+            checkForCaptures("C", place, line);
+        } else if (lineDirection.equals("drl")){
+            int i = line;
+            int j = 0;
+            for(int x = 0; x<place;x++){
+                i++;
+                j++;
+            }
+            theBoard.get(i).get(j).setColorTile("C");
+            theBoard.get(i).get(j).setFreeSpace(false);
+            checkForCaptures("C", i, j);
+        } else if (lineDirection.equals("dlr")){
+            int i = line;
+            int j = 18;
+            for(int x = 0; x<place;x++){
+                i++;
+                j--;
+            }
+            theBoard.get(i).get(j).setColorTile("C");
+            theBoard.get(i).get(j).setFreeSpace(false);
+            checkForCaptures("C", i, j);
+        } else if (lineDirection.equals("drt")){
+            int i=0;
+            int j=line;
+            for(int x = 0; x<place;x++){
+                i++;
+                j++;
+            }
+            theBoard.get(i).get(j).setColorTile("C");
+            theBoard.get(i).get(j).setFreeSpace(false);
+            checkForCaptures("C", i, j);
+        } else if (lineDirection.equals("dlt")){
+            int i=0;
+            int j=line;
+            for(int x = 0; x<place;x++){
+                i++;
+                j--;
+            }
+            theBoard.get(i).get(j).setColorTile("C");
+            theBoard.get(i).get(j).setFreeSpace(false);
+            checkForCaptures("C", i, j);
         }
-
-
-        //TODO diagonal
-
-
-
 
     }
 
@@ -141,8 +186,10 @@ public class PenteBoard {
 
         int rowNum = 10;
         int colNum = 10;
+        int diaNum;
 
-        for(int i=0; i<theBoard.size(); i++){
+
+        for(int i=0; i<theBoard.size(); i++){ //adds all rows
             String row = "";
             for(int j=0; j<theBoard.get(i).size();j++){
                 row = row.concat(theBoard.get(i).get(j).getColorTile());
@@ -153,10 +200,10 @@ public class PenteBoard {
             rowNum++;
         }
 
-        for(int i=0; i<theBoard.size(); i++){
+        for(int j=0; j<theBoard.get(0).size(); j++){ //adds all columns
             String column = "";
-            for(int j=0; j<theBoard.get(i).size();j++){
-                column = column.concat(theBoard.get(j).get(i).getColorTile());
+            for(int i=0; i<theBoard.get(j).size();i++){
+                column = column.concat(theBoard.get(i).get(j).getColorTile());
             }
             column = column+colNum;
             column = column.concat("col");
@@ -164,7 +211,82 @@ public class PenteBoard {
             colNum++;
         }
 
+        diaNum = 10;
+        for(int i=0; i<theBoard.size();i++){ //adds diagonals to the right on the left side. top to bottom
+            int j=0;
+            int tempI = i;
+            String diagonal = "";
+            while(tempI<19 && j<19){
+                diagonal = diagonal.concat(theBoard.get(tempI).get(j).getColorTile());
+                tempI++;
+                j++;
+            }
+            diagonal = diagonal+diaNum;
+            diagonal = diagonal.concat("drl");
+            stringBoard.add(diagonal);
+            diaNum++;
+        }
+
+        diaNum = 10;
+        for(int i=0; i<theBoard.size();i++){ //adds diagonals to the left on the right side.  dlr top to bottom
+            int j=18;
+            int tempI = i;
+            String diagonal = "";
+            while(tempI<19 && j>0){
+                diagonal = diagonal.concat(theBoard.get(tempI).get(j).getColorTile());
+                tempI++;
+                j--;
+            }
+            diagonal = diagonal+diaNum;
+            diagonal = diagonal.concat("dlr");
+            stringBoard.add(diagonal);
+            diaNum++;
+        }
+
+
+
+        diaNum = 10;
+        for(int j=0; j<theBoard.get(0).size();j++){ //adds diagonals to the right along top left to right along top
+            int i=0;
+            int tempJ = j;
+            String diagonal = "";
+            while(tempJ<19 && i<19){
+                diagonal = diagonal.concat(theBoard.get(i).get(tempJ).getColorTile());
+                tempJ++;
+                i++;
+            }
+            diagonal = diagonal+diaNum;
+            diagonal = diagonal.concat("drt");
+            stringBoard.add(diagonal);
+            diaNum++;
+        }
+
+        diaNum = 10;
+        for(int j=0; j<theBoard.get(0).size();j++){ //adds diagonals to the right along top dlt left to right
+            int i=0;
+            int tempJ = j;
+            String diagonal = "";
+            while(tempJ>0 && i<19){
+                diagonal = diagonal.concat(theBoard.get(i).get(tempJ).getColorTile());
+                tempJ--;
+                i++;
+            }
+            diagonal = diagonal+diaNum;
+            diagonal = diagonal.concat("dlt");
+            stringBoard.add(diagonal);
+            diaNum++;
+        }
+
+
+
+
         //TODO all the diagonals have to be added too.
+        //drl * Diagonal to the Right on the Left
+        //drt *
+        //dlr *
+        //dlt  Diagonal to the Left along the Top
+
+
 
         return stringBoard;
     }
@@ -203,9 +325,50 @@ public class PenteBoard {
 
         theBoard.get(offSetI).get(offSetJ).setColorTile("C");
         theBoard.get(offSetI).get(offSetJ).setFreeSpace(false);
+
+        checkForCaptures("C", offSetI, offSetJ);
+    }
+
+    public void checkForCaptures(String mark, int placeI, int placeJ){
+
+
+        int[] cycleI = {0,0,-3,3,-3,-3,3,3};
+        int[] cycleJ = {-3,3,0,0,-3,3,-3,3};
+
+        for(int k=0;k<cycleI.length;k++) {
+            if(placeI + cycleI[k] > 0 && placeI + cycleI[k] < 19 && placeJ + cycleJ[k] > 0 && placeJ + cycleJ[k] < 19){
+                if (getTileColor(placeI + cycleI[k], placeJ + cycleJ[k]).equals(mark)){
+                    int stepI = cycleI[k] / 3;
+                    int stepJ = cycleJ[k] / 3;
+                    if (!getTileColor(placeI + stepI, placeJ + stepJ).equals("F") && !getTileColor(placeI + stepI, placeJ + stepJ).equals(mark) &&
+                            !getTileColor(placeI + (2 * stepI), placeJ + (2 * stepJ)).equals("F") && !getTileColor(placeI + (2 * stepI), placeJ + (2 * stepJ)).equals(mark)) {
+                        theBoard.get(placeI + stepI).get(placeJ + stepJ).setColorTile("F");
+                        theBoard.get(placeI + stepI).get(placeJ + stepJ).setFreeSpace(true);
+                        theBoard.get(placeI + (2 * stepI)).get(placeJ + (2 * stepJ)).setColorTile("F");
+                        theBoard.get(placeI + (2 * stepI)).get(placeJ + (2 * stepJ)).setFreeSpace(true);
+                        if (mark.equals("H")) {
+                            humanCaptures++;
+                        }
+                        if (mark.equals("C")) {
+                            computerCaptures++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void checkForCaptures(String mark, String tileID){
+        ArrayList<Integer> place = returnIJ(tileID);  //i is vertical, j is horizontal
+        int placeI = place.get(0);
+        int placeJ = place.get(1);
+
+        checkForCaptures(mark, placeI, placeJ);
     }
 
     public ArrayList<Object> doesBoardContain(String marks, ArrayList<String> stringBoard){
+
+        marks = marks.toUpperCase();
 
         ArrayList<Object> toReturn = new ArrayList<>();
 
@@ -233,6 +396,13 @@ public class PenteBoard {
             if(line.contains(marks)){
                 return true;
             }
+        }
+
+        if (mark.equals("H") && humanCaptures>=5) {
+            return true;
+        }
+        if (mark.equals("C") && computerCaptures>=5) {
+            return true;
         }
 
         return false;
@@ -270,6 +440,10 @@ public class PenteBoard {
         return defaultReturn;
     }
 
+    public String getTileColor(int i, int j){
+        return theBoard.get(i).get(j).getColorTile();
+    }
+
 
     public ArrayList<ArrayList<PenteTile>> getTheBoard() {
         return theBoard;
@@ -277,5 +451,21 @@ public class PenteBoard {
 
     public void setTheBoard(ArrayList<ArrayList<PenteTile>> theBoard) {
         this.theBoard = theBoard;
+    }
+
+    public int getHumanCaptures() {
+        return humanCaptures;
+    }
+
+    public void setHumanCaptures(int humanCaptures) {
+        this.humanCaptures = humanCaptures;
+    }
+
+    public int getComputerCaptures() {
+        return computerCaptures;
+    }
+
+    public void setComputerCaptures(int computerCaptures) {
+        this.computerCaptures = computerCaptures;
     }
 }

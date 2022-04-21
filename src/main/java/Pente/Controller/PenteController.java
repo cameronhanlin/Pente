@@ -47,6 +47,7 @@ public class PenteController {
         //if(penteBoard.checkTileFree(tileID) && !computerWon){
         if(penteBoard.checkTileFree(tileID)){
             penteBoard.applyHumanMove(tileID);
+            penteBoard.checkForCaptures("H", tileID);
             humanWon = penteBoard.checkForWinner("H");
             numMoves++;
             //if(numMoves<360 && !humanWon){
@@ -95,6 +96,8 @@ public class PenteController {
         modelMap.put("theBoard", penteBoard.getTheBoard());
         modelMap.put("humanWon", humanWon);
         modelMap.put("computerWon", computerWon);
+        modelMap.put("humanCaptures", penteBoard.getHumanCaptures());
+        modelMap.put("computerCaptures", penteBoard.getComputerCaptures());
 
         return modelMap;
     }
