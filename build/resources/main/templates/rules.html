@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/app.css}" />
+
+</head>
+<body>
+
+
+<div class="btn-group" th:background-color="${colorScale.HexValue}" th:color="${offsetScale.LongHexValue}">
+    <div>
+        <a href="/">
+            <button th:border-color="${offsetScale.LongHexValue}">Back to game</button>
+        </a>
+    </div>
+</div>
+
+<br>
+
+<p>
+    <h2>How to take a turn:</h2>
+    <ul>
+        <li>Players take turns placing one piece on the board. Click where you would like your piece to be set.</li>
+        <li>The pieces are placed on the intersections of the lines, rather than inside the squares.</li>
+        <li>The first play is always in the center of the board.</li>
+        <ul>
+            <li>The first Player is chosen at random.</li>
+            <li>Click anywhere inside the board to start play.</li>
+        </ul>
+    </ul>
+    <br>
+    <h2>How to win:</h2>
+    <ul>
+        <li>The object of the game is to either get five pieces in a row (vertically, horizontally or diagonally) or capture five of your opponent's pairs.</li>
+        <ul>
+            <li>The first Player to reach either object, wins immediately.</li>
+        </ul>
+        <li>Captures are made by surrounding 2 of your opponents' stones (vertically, horizontally, or diagonally) with 2 of your stones.</li>
+        <ul>
+            <li>A player's stones cannot be captured by moving in-between 2 of their opponent's existing stones.</li>
+            <li>Multiple captures when placing a single piece is allowed.</li>
+        </ul>
+    </ul>
+</p>
+
+
+<div>
+    <p>Test:</p>
+    <div th:text="${colorScale.HexValue}"></div>
+    <div th:text="${offsetScale.HexValue}"></div>
+
+</div>
+
+
+<!--Humans are red, computer player is blue-->
+
+</body>
+</html>

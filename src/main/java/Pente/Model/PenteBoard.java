@@ -68,15 +68,22 @@ public class PenteBoard {
 
         boolean moveMade = false;
 
+        // lowercase f means a freespace that will not have a tile placed on it, can only be used on the ends.
         ArrayList<String> priority = new ArrayList<String>(  //this Generates a priority for paterns it could play on.
-                Arrays.asList("CCCCF","FCCCC", "CFCCC","CCFCC","CCCFC", // add a fifth to win
+                Arrays.asList("CCCCF","FCCCC", "CFCCC","CCFCC","CCCFC", // add a fifth to win                     #1
                         "FHHHH","HHHHF", "HFHHH", "HHFHH", "HHHFH",// block a fifth that human could win
                         "fFCCCf", "fCCCFf", "fCFCCf", "fCCFCf", // make open ended 4
                         "FHHHF", "fHFHHf", "fHHFHf", //block an open ended 4 from being made
-                        "FHHC", "CHHF", // capture
-                        "FCCH","HCCF", //block capture
-                        "fCFFCf")); //tries to connect its own pieces better
+                        "FHHC", "CHHF", // capture                                                              #if computer capture is 4, this should be #2
+                        "FCCH","HCCF", //block capture                                                          #if human capture is 4, this should be # 2/3
+                        "FHHF", //tries to start a capture
+                        "fCFFCf", //tries to connect its own pieces better
+                        "FCFCFf", "fFCFCF", //place a random tile if its got two going for it
+                        "fFFCCFFf")); //places something around if its got two in a row
         ArrayList<String> stringBoard = theBoardAsStrings();
+
+        //TODO rearrange priorities if human captures are at 4 or if computer captures are at 4? if statements for first part and then add the rest to all after?
+        //TODO Do you want to try and add in patern logic?
 
 
         for(String checkFor : priority){
@@ -93,86 +100,75 @@ public class PenteBoard {
             }
         }
 
-
-
         if(!moveMade){
             makeRandoComputerMove(humanTile);
         }
-
-
-
     }
 
     public void knownComputerMove(String checkFor, String lineKey, String lineCode){
-
         checkFor = checkFor.replaceAll("f","");
         int place = lineKey.indexOf(checkFor);
         int placePlus = 0;
         int count = checkFor.length() - checkFor.replaceAll("F","").length();
         int line = Integer.valueOf(lineCode.substring(0,2))-10;
         String lineDirection = lineCode.substring(2);
-        System.out.println("looking for "+checkFor);
+        System.out.println("looking for "+checkFor+" which is size "+checkFor.length());
         System.out.println("In Known Computer Moves, Line num "+line);
         System.out.println("In Known Computer Moves, Direction "+lineDirection);
 
-
-        if(count == 1){
+        if(count == 1){         //if there was only one Capital F in the key string, it goes to that place
             placePlus = checkFor.indexOf("F");
-        } else {
+        } else {                //if there were two or more Capital F in the key String, it randomly picks one.
             int somePlace;
             do{
                 somePlace = rand.nextInt(checkFor.length());
-            } while (!checkFor.substring(somePlace).equals("F")); ///TODO here its just random, do you want to prioritize a freespace next to another free space?
+            } while (!checkFor.substring(somePlace,somePlace+1).equals("F"));
             placePlus = somePlace;
         }
 
         place = place + placePlus;
+        System.out.println("at place "+place);
 
         // row
-        if(lineDirection.equals("row")){
+        if(lineDirection.equals("row")){     //if the key string was in a row, it finds the location here.
             theBoard.get(line).get(place).setColorTile("C");
             theBoard.get(line).get(place).setFreeSpace(false);
             checkForCaptures("C", line, place);
-        } else if (lineDirection.equals("col")) {
+        } else if (lineDirection.equals("col")) {  //if the key string was in a column, it finds the location here.
             theBoard.get(place).get(line).setColorTile("C");
             theBoard.get(place).get(line).setFreeSpace(false);
             checkForCaptures("C", place, line);
-        } else if (lineDirection.equals("drl")){
-            int i = line;
+        } else { // in here is where it checks all the diagonals
+            int i = 0;
             int j = 0;
-            for(int x = 0; x<place;x++){
-                i++;
-                j++;
-            }
-            theBoard.get(i).get(j).setColorTile("C");
-            theBoard.get(i).get(j).setFreeSpace(false);
-            checkForCaptures("C", i, j);
-        } else if (lineDirection.equals("dlr")){
-            int i = line;
-            int j = 18;
-            for(int x = 0; x<place;x++){
-                i++;
-                j--;
-            }
-            theBoard.get(i).get(j).setColorTile("C");
-            theBoard.get(i).get(j).setFreeSpace(false);
-            checkForCaptures("C", i, j);
-        } else if (lineDirection.equals("drt")){
-            int i=0;
-            int j=line;
-            for(int x = 0; x<place;x++){
-                i++;
-                j++;
-            }
-            theBoard.get(i).get(j).setColorTile("C");
-            theBoard.get(i).get(j).setFreeSpace(false);
-            checkForCaptures("C", i, j);
-        } else if (lineDirection.equals("dlt")){
-            int i=0;
-            int j=line;
-            for(int x = 0; x<place;x++){
-                i++;
-                j--;
+            if (lineDirection.equals("drl")){    //drl: Diagonal to the Right on the Left side.
+                i = line;
+                //j = 0;
+                for(int x = 0; x<place;x++){
+                    i++;
+                    j++;
+                }
+            } else if (lineDirection.equals("dlr")){ //dlr: Diagonal to the Left on the Right side.
+                i = line;
+                j = 18;
+                for(int x = 0; x<place;x++){
+                    i++;
+                    j--;
+                }
+            } else if (lineDirection.equals("drt")){ //drt: Diagonal to the Right along the Top
+                //i=0;
+                j=line;
+                for(int x = 0; x<place;x++){
+                    i++;
+                    j++;
+                }
+            } else if (lineDirection.equals("dlt")){ //dlt: Diagonal to the Left along the Top
+                //i=0;
+                j=line;
+                for(int x = 0; x<place;x++){
+                    i++;
+                    j--;
+                }
             }
             theBoard.get(i).get(j).setColorTile("C");
             theBoard.get(i).get(j).setFreeSpace(false);
@@ -216,7 +212,7 @@ public class PenteBoard {
             int j=0;
             int tempI = i;
             String diagonal = "";
-            while(tempI<19 && j<19){
+            while(tempI<=18 && j<=18){
                 diagonal = diagonal.concat(theBoard.get(tempI).get(j).getColorTile());
                 tempI++;
                 j++;
@@ -232,7 +228,7 @@ public class PenteBoard {
             int j=18;
             int tempI = i;
             String diagonal = "";
-            while(tempI<19 && j>0){
+            while(tempI<=18 && j>=0){
                 diagonal = diagonal.concat(theBoard.get(tempI).get(j).getColorTile());
                 tempI++;
                 j--;
@@ -243,14 +239,12 @@ public class PenteBoard {
             diaNum++;
         }
 
-
-
         diaNum = 10;
         for(int j=0; j<theBoard.get(0).size();j++){ //adds diagonals to the right along top left to right along top
             int i=0;
             int tempJ = j;
             String diagonal = "";
-            while(tempJ<19 && i<19){
+            while(tempJ<=18 && i<=18){
                 diagonal = diagonal.concat(theBoard.get(i).get(tempJ).getColorTile());
                 tempJ++;
                 i++;
@@ -266,7 +260,7 @@ public class PenteBoard {
             int i=0;
             int tempJ = j;
             String diagonal = "";
-            while(tempJ>0 && i<19){
+            while(tempJ>=0 && i<=18){
                 diagonal = diagonal.concat(theBoard.get(i).get(tempJ).getColorTile());
                 tempJ--;
                 i++;
@@ -277,22 +271,11 @@ public class PenteBoard {
             diaNum++;
         }
 
-
-
-
-        //TODO all the diagonals have to be added too.
-        //drl * Diagonal to the Right on the Left
-        //drt *
-        //dlr *
-        //dlt  Diagonal to the Left along the Top
-
-
-
         return stringBoard;
     }
 
-    public void makeRandoComputerMove(String humanTile){
-        ArrayList<Integer> humanMove = returnIJ(humanTile);
+    public void makeRandoComputerMove(String humanTile){    //TODO it will sometimes randomly set the human up for a capture.
+        ArrayList<Integer> humanMove = returnIJ(humanTile); //TODO, make it rando based off last played computer piece?
         int humanI = humanMove.get(0);
         int humanJ = humanMove.get(1);
 
@@ -336,7 +319,7 @@ public class PenteBoard {
         int[] cycleJ = {-3,3,0,0,-3,3,-3,3};
 
         for(int k=0;k<cycleI.length;k++) {
-            if(placeI + cycleI[k] > 0 && placeI + cycleI[k] < 19 && placeJ + cycleJ[k] > 0 && placeJ + cycleJ[k] < 19){
+            if(placeI + cycleI[k] >= 0 && placeI + cycleI[k] <= 18 && placeJ + cycleJ[k] >= 0 && placeJ + cycleJ[k] <= 18){
                 if (getTileColor(placeI + cycleI[k], placeJ + cycleJ[k]).equals(mark)){
                     int stepI = cycleI[k] / 3;
                     int stepJ = cycleJ[k] / 3;
@@ -420,6 +403,22 @@ public class PenteBoard {
         }
 
         return false;
+    }
+
+    public boolean checkTileAvailable(){   //only returns false if all tiles are full
+        for(ArrayList<PenteTile> row: theBoard) {
+            for (PenteTile tile : row) {
+                if (tile.isFreeSpace()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void setATile(String mark, int i, int j){ //should only be used for first move stuff
+        theBoard.get(i).get(j).setColorTile(mark);
+        theBoard.get(i).get(j).setFreeSpace(false);
     }
 
     public ArrayList<Integer> returnIJ(String tileID){ //i is vertical, j is horizontal
