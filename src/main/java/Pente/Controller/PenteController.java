@@ -67,7 +67,7 @@ public class PenteController {
             if(rand.nextInt(2) == 0){
                 penteBoard.setATile("H",9,9);
                 numMoves++;
-                penteBoard.makeComputerMove("180");
+                penteBoard.makeComputerMove();
                 numMoves++;
             } else {
                 penteBoard.setATile("C",9,9);
@@ -82,7 +82,7 @@ public class PenteController {
                 numMoves++;
                 //if(penteBoard.checkTileAvailable() && !humanWon){
                 if(penteBoard.checkTileAvailable()){
-                    penteBoard.makeComputerMove(tileID);
+                    penteBoard.makeComputerMove();
                     computerWon = penteBoard.checkForWinner("C");
                     numMoves++;
                 }
@@ -132,8 +132,6 @@ public class PenteController {
 
         modelMap.put("colorScale",colorScale);
         modelMap.put("offsetScale",offsetScale);
-        System.out.println(colorScale.getLongHexValue());
-        System.out.println(offsetScale.getLongHexValue());
 
         return modelMap;
     }

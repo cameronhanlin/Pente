@@ -17,12 +17,14 @@ public class PenteBoard {
     Random rand = new Random();
     int humanCaptures;
     int computerCaptures;
+    int lastComputerMove;
 
 
     public void newBoard(){
         theBoard.clear();
         humanCaptures = 0;
         computerCaptures =0;
+        lastComputerMove = 180;
         int cellID = 0;
         for(int i=0; i<19; i++){
             ArrayList<PenteTile> tempRow = new ArrayList<>();
@@ -47,7 +49,7 @@ public class PenteBoard {
         }
     }
 
-    public void makeComputerMove(String humanTile){
+    public void makeComputerMove(){
 
         /*Priority of computer moves
         if have 4 in a row, play the 5th to win
@@ -101,7 +103,7 @@ public class PenteBoard {
         }
 
         if(!moveMade){
-            makeRandoComputerMove(humanTile);
+            makeRandoComputerMove();
         }
     }
 
@@ -274,8 +276,8 @@ public class PenteBoard {
         return stringBoard;
     }
 
-    public void makeRandoComputerMove(String humanTile){    //TODO it will sometimes randomly set the human up for a capture.
-        ArrayList<Integer> humanMove = returnIJ(humanTile); //TODO, make it rando based off last played computer piece?
+    public void makeRandoComputerMove(){    //TODO it will sometimes randomly set the human up for a capture.
+        ArrayList<Integer> humanMove = returnIJ(String.valueOf(lastComputerMove));
         int humanI = humanMove.get(0);
         int humanJ = humanMove.get(1);
 
@@ -313,6 +315,10 @@ public class PenteBoard {
     }
 
     public void checkForCaptures(String mark, int placeI, int placeJ){
+
+        if(mark.equals("C")){
+            lastComputerMove = returnTileID(placeI, placeJ);
+        }
 
 
         int[] cycleI = {0,0,-3,3,-3,-3,3,3};
@@ -437,6 +443,10 @@ public class PenteBoard {
         defaultReturn.add(0);
         defaultReturn.add(0);
         return defaultReturn;
+    }
+
+    public int returnTileID(int i, int j){
+        return theBoard.get(i).get(j).getId();
     }
 
     public String getTileColor(int i, int j){

@@ -18,9 +18,9 @@ public class GrayService {
         String url = "http://www.254shadesofgray.com/api/gray/";
 
         if(currentNumber >127){
-            currentNumber = currentNumber - 100;
+            currentNumber = currentNumber - 120;
         } else {
-            currentNumber = currentNumber + 100;
+            currentNumber = currentNumber + 120;
         }
 
         url = url+currentNumber;
