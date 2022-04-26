@@ -21,7 +21,9 @@ public class PenteController {
     GrayService grayService = new GrayService();
     ColorScale colorScale = grayService.fetchGrayColorData();
     ColorScale offsetScale = grayService.fetchOffsetColor(colorScale.getNumericValue());
-    //TODO You were getting the colors implemented on your buttons correctly. Check the CSS Border of the buttons and something with your cache
+    //TODO You were getting the colors implemented on your buttons correctly. Check the .css Button border of the buttons and something with your cache
+    //TODO Error page?
+    //TODO clear terminal
 
     Random rand = new Random();
     int numMoves = 0;
@@ -56,13 +58,6 @@ public class PenteController {
 
     @RequestMapping("human/{tileID}")
     public String makeHumanMove(@PathVariable String tileID, ModelMap modelMap){
-
-
-        //TODO Rules page? explain how to win with 5 in a row, 5 captures, and that first move is random and must be places in center
-        //TODO you will let the game keep going if someone won
-
-
-
         if(numMoves == 0){
             if(rand.nextInt(2) == 0){
                 penteBoard.setATile("H",9,9);
@@ -74,14 +69,13 @@ public class PenteController {
                 numMoves++;
             }
         } else {
-            //if(penteBoard.checkTileFree(tileID) && !computerWon && penteBoard.checkTileAvailable()){
-            if(penteBoard.checkTileFree(tileID) && penteBoard.checkTileAvailable()){
+            if(penteBoard.checkTileFree(tileID) && !computerWon && !humanWon &&penteBoard.checkTileAvailable()){
+                //TODO make your tileID convert to a int, and then only used as a int elsewhere.
                 penteBoard.applyHumanMove(tileID);
                 penteBoard.checkForCaptures("H", tileID);
                 humanWon = penteBoard.checkForWinner("H");
                 numMoves++;
-                //if(penteBoard.checkTileAvailable() && !humanWon){
-                if(penteBoard.checkTileAvailable()){
+                if(penteBoard.checkTileAvailable() && !humanWon){
                     penteBoard.makeComputerMove();
                     computerWon = penteBoard.checkForWinner("C");
                     numMoves++;
@@ -132,6 +126,8 @@ public class PenteController {
 
         modelMap.put("colorScale",colorScale);
         modelMap.put("offsetScale",offsetScale);
+
+
 
         return modelMap;
     }

@@ -86,7 +86,7 @@ public class PenteBoard {
 
         //TODO rearrange priorities if human captures are at 4 or if computer captures are at 4? if statements for first part and then add the rest to all after?
         //TODO Do you want to try and add in patern logic?
-
+        //TODO website title tab
 
         for(String checkFor : priority){
             ArrayList<Object> someReturn = doesBoardContain(checkFor, stringBoard);
@@ -277,7 +277,7 @@ public class PenteBoard {
     }
 
     public void makeRandoComputerMove(){    //TODO it will sometimes randomly set the human up for a capture.
-        ArrayList<Integer> humanMove = returnIJ(String.valueOf(lastComputerMove));
+        ArrayList<Integer> humanMove = returnIJ(String.valueOf(lastComputerMove)); //TODO, maybe prioritize being closer to other pieces?
         int humanI = humanMove.get(0);
         int humanJ = humanMove.get(1);
 

@@ -13,9 +13,19 @@
     width: 760px;
     height: 760px;
     outline: 2px solid #ccc;
+    position: absolute;
+    top: 44px;
+    left: 2%;
 }
 
 .penteBoard .tile{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.tileCapture{
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -29,7 +39,7 @@
 
 
 .btn-group button {
-
+    font-size: 20px;
     border: 1px solid black;
 
     padding: 10px 24px; /* Some padding */
@@ -50,4 +60,41 @@
 
 .btn-group button:hover {
     background-color: #FFFFFF;
+}
+
+.split {
+    height: 100%;
+
+
+    z-index: 1;
+    top: 0;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+.left {
+    left: 0;
+    align: left;
+}
+
+.right {
+    right: 0;
+    align: right;
+}
+
+.centered {
+    position: absolute;
+    top: 100px;
+    right: 10%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.scorebox {
+    font-size: 20px;
+    position: absolute;
+    right: 20%;
+    text-align: right;
+    padding: 10px;
+    outline: 2px solid #ccc;
 }
