@@ -58,27 +58,32 @@ public class PenteController {
 
     @RequestMapping("human/{tileID}")
     public String makeHumanMove(@PathVariable String tileID, ModelMap modelMap){
-        if(numMoves == 0){
-            if(rand.nextInt(2) == 0){
-                penteBoard.setATile("H",9,9);
-                numMoves++;
-                penteBoard.makeComputerMove();
-                numMoves++;
-            } else {
-                penteBoard.setATile("C",9,9);
-                numMoves++;
-            }
+
+        if(penteBoard.getTheBoard().size() < 19){
+            penteBoard.newBoard();
         } else {
-            if(penteBoard.checkTileFree(tileID) && !computerWon && !humanWon &&penteBoard.checkTileAvailable()){
-                //TODO make your tileID convert to a int, and then only used as a int elsewhere.
-                penteBoard.applyHumanMove(tileID);
-                penteBoard.checkForCaptures("H", tileID);
-                humanWon = penteBoard.checkForWinner("H");
-                numMoves++;
-                if(penteBoard.checkTileAvailable() && !humanWon){
-                    penteBoard.makeComputerMove();
-                    computerWon = penteBoard.checkForWinner("C");
+            if(numMoves == 0){
+                if(rand.nextInt(2) == 0){
+                    penteBoard.setATile("H",9,9);
                     numMoves++;
+                    penteBoard.makeComputerMove();
+                    numMoves++;
+                } else {
+                    penteBoard.setATile("C",9,9);
+                    numMoves++;
+                }
+            } else {
+                if(penteBoard.checkTileFree(tileID) && !computerWon && !humanWon &&penteBoard.checkTileAvailable()){
+                    //TODO make your tileID convert to a int, and then only used as a int elsewhere.
+                    penteBoard.applyHumanMove(tileID);
+                    penteBoard.checkForCaptures("H", tileID);
+                    humanWon = penteBoard.checkForWinner("H");
+                    numMoves++;
+                    if(penteBoard.checkTileAvailable() && !humanWon){
+                        penteBoard.makeComputerMove();
+                        computerWon = penteBoard.checkForWinner("C");
+                        numMoves++;
+                    }
                 }
             }
         }

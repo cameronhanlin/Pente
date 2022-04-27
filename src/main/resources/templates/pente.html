@@ -13,7 +13,12 @@
 
 
 <div class="split right">
+
+
+
     <div class="centered">
+        <h1 class="title">Pente</h1>
+
         <div class="btn-group" th:background-color="${colorScale.HexValue}" th:color="${offsetScale.LongHexValue}">
             <a href="/startNewGame">
                 <button th:border-color="${offsetScale.LongHexValue}">Start a new Game</button>
@@ -23,12 +28,7 @@
             </a>
         </div>
 
-        <div th:hidden="${!humanWon}">
-            The human person won
-        </div>
-        <div th:hidden="${!computerWon}">
-            The machine won
-        </div>
+
 
         <br>
         <br>
@@ -49,6 +49,21 @@
 </div>
 
 <div class="split left">
+
+    <div th:hidden="${!humanWon}">
+        <div class="alert">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <strong>Congratulations!</strong> You won!
+        </div>
+    </div>
+
+    <div th:hidden="${!computerWon}">
+        <div class="alert">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            I am sorry, the computer won.
+        </div>
+    </div>
+
     <div class="penteBoard">
         <div th:each="currentRow : ${theBoard}">
             <div class="row">
