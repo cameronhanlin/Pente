@@ -54,39 +54,60 @@ public class PenteBoard {
         /*Priority of computer moves
         if have 4 in a row, play the 5th to win
         if have a 5 but missing one pocket to win
-        --if have 4 captured, capture a 5th to win
+        if have 4 captured, capture a 5th to win
         if opponent has 4 in a row, block
-        --if oppenent has 4 captures, block the capture
+        if oppenent has 4 captures, block the capture
         check for if oppenent has a pocket 5 in row HHFHH
         if have open 3, make open 4 prioritize an area that it could have 5 in a row to win
         look for a pocket to make 4 in a row CFCC
         if oppenent has open 3 in a row, block
         if can make a capture, do it.
         if can block a capture, block it
-        --if have open 2, make open 3, prioritize an area that it could have 5 in a row
-        --else play a random piece near where the human last played?
-
+        if have open 2, make open 3, prioritize an area that it could have 5 in a row
+        else play a random piece near where the the last piece was played?
          */
 
         boolean moveMade = false;
 
         // lowercase f means a freespace that will not have a tile placed on it, can only be used on the ends.
-        ArrayList<String> priority = new ArrayList<String>(  //this Generates a priority for paterns it could play on.
-                Arrays.asList("CCCCF","FCCCC", "CFCCC","CCFCC","CCCFC", // add a fifth to win                     #1
-                        "FHHHH","HHHHF", "HFHHH", "HHFHH", "HHHFH",// block a fifth that human could win
-                        "fFCCCf", "fCCCFf", "fCFCCf", "fCCFCf", // make open ended 4
-                        "FHHHF", "fHFHHf", "fHHFHf", //block an open ended 4 from being made
-                        "FHHC", "CHHF", // capture                                                              #if computer capture is 4, this should be #2
-                        "FCCH","HCCF", //block capture                                                          #if human capture is 4, this should be # 2/3
-                        "FHHF", //tries to start a capture
-                        "fCFFCf", //tries to connect its own pieces better
-                        "FCFCFf", "fFCFCF", //place a random tile if its got two going for it
-                        "fFFCCFFf")); //places something around if its got two in a row
+        ArrayList<String> priority = new ArrayList<>(  //this Generates a priority for patterns it could play on.
+                Arrays.asList("CCCCF","FCCCC", "CFCCC","CCFCC","CCCFC")); // add a fifth to win
+        if(computerCaptures == 4){
+            priority.addAll(Arrays.asList("FHHC", "CHHF", // capture
+                    "FHHHH","HHHHF", "HFHHH", "HHFHH", "HHHFH",// block a fifth that human could win
+                    "fFCCCf", "fCCCFf", "fCFCCf", "fCCFCf", // make open ended 4
+                    "FHHHF", "fHFHHf", "fHHFHf", //block an open ended 4 from being made
+                    "FCCH","HCCF")); //block capture
+        } else if ( humanCaptures == 4) {
+            priority.addAll(Arrays.asList("FCCH", "HCCF", //block capture
+                    "FHHHH", "HHHHF", "HFHHH", "HHFHH", "HHHFH",// block a fifth that human could win
+                    "fFCCCf", "fCCCFf", "fCFCCf", "fCCFCf", // make open ended 4
+                    "FHHHF", "fHFHHf", "fHHFHf", //block an open ended 4 from being made
+                    "FHHC", "CHHF")); // capture
+        } else if (computerCaptures < humanCaptures) {
+            priority.addAll(Arrays.asList("FHHHH","HHHHF", "HFHHH", "HHFHH", "HHHFH",// block a fifth that human could win
+                    "fFCCCf", "fCCCFf", "fCFCCf", "fCCFCf", // make open ended 4
+                    "FHHHF", "fHFHHf", "fHHFHf", //block an open ended 4 from being made
+                    "FCCH","HCCF", //block capture
+                    "FHHC", "CHHF")); // capture
+
+        } else {
+            priority.addAll(Arrays.asList("FHHHH","HHHHF", "HFHHH", "HHFHH", "HHHFH",// block a fifth that human could win
+                    "fFCCCf", "fCCCFf", "fCFCCf", "fCCFCf", // make open ended 4
+                    "FHHHF", "fHFHHf", "fHHFHf", //block an open ended 4 from being made
+                    "FHHC", "CHHF", // capture
+                    "FCCH","HCCF")); //block capture
+        }
+
+        priority.addAll(Arrays.asList("FHHF", //tries to start a capture
+                "fCFFCf", //tries to connect its own pieces better
+                "FCFCFf", "fFCFCF", //place a random tile if its got two going for it
+                "fFFCCFFf",  //places something around if its got two in a row
+                "fCFFFCf")); //places something if its got a 3 tile gap
+
         ArrayList<String> stringBoard = theBoardAsStrings();
 
-        //TODO rearrange priorities if human captures are at 4 or if computer captures are at 4? if statements for first part and then add the rest to all after?
-        //TODO Do you want to try and add in patern logic?
-        //TODO website title tab
+
 
         for(String checkFor : priority){
             ArrayList<Object> someReturn = doesBoardContain(checkFor, stringBoard);
@@ -95,7 +116,6 @@ public class PenteBoard {
                 String line = (String)someReturn.get(1);
                 String lineKey = line.substring(0,line.length()-5);
                 String lineCode = line.substring(line.length()-5,line.length());
-                System.out.println(lineKey+" "+lineCode);
                 knownComputerMove(checkFor, lineKey, lineCode);
                 moveMade = true;
                 break;
@@ -114,9 +134,6 @@ public class PenteBoard {
         int count = checkFor.length() - checkFor.replaceAll("F","").length();
         int line = Integer.valueOf(lineCode.substring(0,2))-10;
         String lineDirection = lineCode.substring(2);
-        System.out.println("looking for "+checkFor+" which is size "+checkFor.length());
-        System.out.println("In Known Computer Moves, Line num "+line);
-        System.out.println("In Known Computer Moves, Direction "+lineDirection);
 
         if(count == 1){         //if there was only one Capital F in the key string, it goes to that place
             placePlus = checkFor.indexOf("F");
@@ -129,7 +146,6 @@ public class PenteBoard {
         }
 
         place = place + placePlus;
-        System.out.println("at place "+place);
 
         // row
         if(lineDirection.equals("row")){     //if the key string was in a row, it finds the location here.
@@ -276,12 +292,30 @@ public class PenteBoard {
         return stringBoard;
     }
 
-    public void makeRandoComputerMove(){    //TODO it will sometimes randomly set the human up for a capture.
-        ArrayList<Integer> humanMove = returnIJ(String.valueOf(lastComputerMove)); //TODO, maybe prioritize being closer to other pieces?
-        int humanI = humanMove.get(0);
-        int humanJ = humanMove.get(1);
+    public ArrayList<Object> doesBoardContain(String marks, ArrayList<String> stringBoard){
 
-        int maxRange = 2; //a range for distance from human guess for the computer
+        marks = marks.toUpperCase();
+
+        ArrayList<Object> toReturn = new ArrayList<>();
+
+        for(String line : stringBoard){
+            if(line.contains(marks)){
+                toReturn.add(true);
+                toReturn.add(line);
+                return toReturn;
+            }
+        }
+
+        toReturn.add(false);
+        return toReturn;
+    }
+
+    public void makeRandoComputerMove(){
+        ArrayList<Integer> lastMove = returnIJ(String.valueOf(lastComputerMove));
+        int lastI = lastMove.get(0);
+        int lastJ = lastMove.get(1);
+
+        int maxRange = 2; //a range for distance from last guess for the computer
         int maxGuess = 1; //a counter for when the computer should increase the range of guesses
 
         int offSetI = 0;
@@ -290,8 +324,8 @@ public class PenteBoard {
         do{
             offSetI = rand.nextInt(maxRange*2)-maxRange;
             offSetJ = rand.nextInt(maxRange*2)-maxRange;
-            offSetI = offSetI+humanI;
-            offSetJ = offSetJ+humanJ;
+            offSetI = offSetI+lastI;
+            offSetJ = offSetJ+lastJ;
             if(offSetI<0)
                 offSetI=0;
             if(offSetI>18)
@@ -306,12 +340,54 @@ public class PenteBoard {
             }
             maxGuess++;
 
-        } while (!theBoard.get(offSetI).get(offSetJ).isFreeSpace());
+        } while (!theBoard.get(offSetI).get(offSetJ).isFreeSpace() || doesMoveSetupComputerForCapture(offSetI, offSetJ));
 
         theBoard.get(offSetI).get(offSetJ).setColorTile("C");
         theBoard.get(offSetI).get(offSetJ).setFreeSpace(false);
 
         checkForCaptures("C", offSetI, offSetJ);
+    }
+
+    public boolean doesMoveSetupComputerForCapture(int placeI, int placeJ){
+        int[] cycleI = {0,0,-2,2,-2,-2,2,2};
+        int[] cycleJ = {-2,2,0,0,-2,2,-2,2};
+
+        for(int k=0;k<cycleI.length;k++) {
+            if(placeI + cycleI[k] >= 0 && placeI + cycleI[k] <= 18 && placeJ + cycleJ[k] >= 0 && placeJ + cycleJ[k] <= 18){
+                if (getTileColor(placeI + cycleI[k], placeJ + cycleJ[k]).equals("H")){
+                    int stepI = cycleI[k] / 2;
+                    int stepJ = cycleJ[k] / 2;
+                    if (getTileColor(placeI + stepI, placeJ + stepJ).equals("C")) {
+                        System.out.println("Yea its setting up for capture");
+                        return true;
+                    }
+                }
+            }
+        }
+
+        for(int k=0;k<cycleI.length;k++) {
+            if(placeI + (cycleI[k]/2) >= 0 && placeI + (cycleI[k]/2) <= 18 && placeJ + (cycleJ[k]/2) >= 0 && placeJ + (cycleJ[k]/2) <= 18 &&
+                placeI + (cycleI[k]/-2) >= 0 && placeI + (cycleI[k]/-2) <= 18 && placeJ + (cycleJ[k]/-2) >= 0 && placeJ + (cycleJ[k]/-2) <= 18){
+                if (getTileColor(placeI + (cycleI[k]/2), placeJ + (cycleJ[k]/2)).equals("H")){
+                    if (getTileColor(placeI + (cycleI[k]/-2), placeJ + (cycleJ[k]/-2)).equals("C")) {
+                        System.out.println("Yea its setting up for capture");
+                        return true;
+                    }
+                }
+            }
+        }
+
+
+
+        return false;
+    }
+
+    public void checkForCaptures(String mark, String tileID){
+        ArrayList<Integer> place = returnIJ(tileID);  //i is vertical, j is horizontal
+        int placeI = place.get(0);
+        int placeJ = place.get(1);
+
+        checkForCaptures(mark, placeI, placeJ);
     }
 
     public void checkForCaptures(String mark, int placeI, int placeJ){
@@ -347,31 +423,9 @@ public class PenteBoard {
         }
     }
 
-    public void checkForCaptures(String mark, String tileID){
-        ArrayList<Integer> place = returnIJ(tileID);  //i is vertical, j is horizontal
-        int placeI = place.get(0);
-        int placeJ = place.get(1);
 
-        checkForCaptures(mark, placeI, placeJ);
-    }
 
-    public ArrayList<Object> doesBoardContain(String marks, ArrayList<String> stringBoard){
 
-        marks = marks.toUpperCase();
-
-        ArrayList<Object> toReturn = new ArrayList<>();
-
-        for(String line : stringBoard){
-            if(line.contains(marks)){
-                toReturn.add(true);
-                toReturn.add(line);
-                return toReturn;
-            }
-        }
-
-        toReturn.add(false);
-        return toReturn;
-    }
 
     public boolean checkForWinner(String mark){
         String marks = "";

@@ -40,7 +40,7 @@
 
 .btn-group button {
     font-size: 20px;
-    border: 1px solid black;
+    border: 1px solid;
 
     padding: 10px 24px; /* Some padding */
     cursor: pointer; /* Pointer/hand icon */

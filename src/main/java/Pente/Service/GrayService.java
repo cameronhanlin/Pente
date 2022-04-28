@@ -9,7 +9,6 @@ public class GrayService {
 
     public ColorScale fetchGrayColorData(){
         RestTemplate restTemplate = new RestTemplate();
-        System.out.println("should be pulling something");
         return restTemplate.getForObject("http://www.254shadesofgray.com/api/GrayOfTheDay", ColorScale.class);
     }
 
@@ -24,7 +23,6 @@ public class GrayService {
         }
 
         url = url+currentNumber;
-        System.out.println("should be doing something again");
         return restTemplate.getForObject(url, ColorScale.class);
     }
 

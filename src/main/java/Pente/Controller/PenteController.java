@@ -21,9 +21,6 @@ public class PenteController {
     GrayService grayService = new GrayService();
     ColorScale colorScale = grayService.fetchGrayColorData();
     ColorScale offsetScale = grayService.fetchOffsetColor(colorScale.getNumericValue());
-    //TODO You were getting the colors implemented on your buttons correctly. Check the .css Button border of the buttons and something with your cache
-    //TODO Error page?
-    //TODO clear terminal
 
     Random rand = new Random();
     int numMoves = 0;
@@ -58,6 +55,9 @@ public class PenteController {
 
     @RequestMapping("human/{tileID}")
     public String makeHumanMove(@PathVariable String tileID, ModelMap modelMap){
+
+        //TODO make sure the tileID is good enough
+
 
         if(penteBoard.getTheBoard().size() < 19){
             penteBoard.newBoard();
